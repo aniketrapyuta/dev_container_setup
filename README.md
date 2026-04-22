@@ -47,6 +47,8 @@ BASE_IMAGE=<your image name> # ex: osrf/ros:noetic-desktop-full # to develop ove
 DEV_USER=dev # username inside docker container
 DEV_HOME=/home/dev # home directory inside docker container
 HOST_WORKSPACE=/home/aniket/localizationws # your local catkin workspace
+IMAGE_NAME=my-dev-image # your custom image name
+CONTAINER_NAME=my-dev-container # your custom container name
 INSTALL_EXTRA_DEV_TOOLS=true # install additional ros tooling like ros-noetic-tf2-ros, etc
 ```
 
