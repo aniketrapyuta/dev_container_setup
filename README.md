@@ -1,6 +1,7 @@
 # Development Docker Environment
 
-This repository provides a reproducible development(I am using ROS Noetic) container with persistent workspace data, logs, and VS Code server state.
+This repository provides a reproducible development container with persistent workspace data, logs, and VS Code server state.
+I am currently using this to develop over with ROS Noetic packages on ubuntu 24.04
 
 ## What You Get
 
@@ -18,13 +19,13 @@ This repository provides a reproducible development(I am using ROS Noetic) conta
 
 ## Host Setup
 
-Create local directories in this repository:
+Create local directories in this repository(gitignored):
 
 ```bash
 mkdir -p .vscode-server config logs/ros logs/app
 ```
 
-Create your host catkin workspace directory (used by `HOST_WORKSPACE`):
+Create your host catkin workspace directory (set as `HOST_WORKSPACE` in `.private/env`):
 
 ```bash
 mkdir -p /home/aniket/localizationws/{src,build,devel,install}
@@ -42,16 +43,16 @@ sudo chown -R "$(id -u):$(id -g)" \
 Create `.private/.env` (gitignored):
 
 ```bash
-BASE_IMAGE=osrf/ros:noetic-desktop-full
-DEV_USER=dev
-DEV_HOME=/home/dev
-HOST_WORKSPACE=/home/aniket/localizationws
-INSTALL_EXTRA_DEV_TOOLS=true
+BASE_IMAGE=<your image name> # ex: osrf/ros:noetic-desktop-full # to develop over this image in docker
+DEV_USER=dev # username inside docker container
+DEV_HOME=/home/dev # home directory inside docker container
+HOST_WORKSPACE=/home/aniket/localizationws # your local catkin workspace
+INSTALL_EXTRA_DEV_TOOLS=true # install additional ros tooling like ros-noetic-tf2-ros, etc
 ```
 
 Notes:
 
-- `BASE_IMAGE` is the parent image used by `Dockerfile.localization`.
+- `BASE_IMAGE` is the parent image used by `Dockerfile`.
 - `HOST_WORKSPACE` must contain `src`, `build`, and `devel` directories.
 - `scripts/start-loc.sh` loads `.private/.env` automatically.
 
@@ -64,7 +65,7 @@ chmod +x ./scripts/start-loc.sh
 
 The startup script will:
 
-- prepare host X11 access
+- prepare host X11 access, currently tested with ubuntu 24.04
 - load `.private/.env` and runtime `.env`
 - validate writable mounted directories
 - build image
