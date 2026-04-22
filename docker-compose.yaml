@@ -1,0 +1,64 @@
+services:
+  development-noetic:
+    image: ${IMAGE_NAME}
+    pull_policy: never
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        INSTALL_EXTRA_DEV_TOOLS: ${INSTALL_EXTRA_DEV_TOOLS:-true}
+        BASE_IMAGE: ${BASE_IMAGE:-osrf/ros:noetic-desktop-full}
+        DEV_USER: ${DEV_USER:-dev}
+        DEV_HOME: ${DEV_HOME:-/home/dev}
+    container_name: ${CONTAINER_NAME}
+
+    tty: true
+    stdin_open: true
+    working_dir: ${DEV_HOME:-/home/dev}/catkin_ws
+    entrypoint: /bin/bash
+    command: []
+
+    network_mode: host
+    ipc: host
+    privileged: true
+
+    environment:
+      DISPLAY: ${DISPLAY}
+      XAUTHORITY: ${DEV_HOME:-/home/dev}/.Xauthority
+      QT_X11_NO_MITSHM: "1"
+      LIBGL_ALWAYS_INDIRECT: "0"
+      LIBGL_ALWAYS_SOFTWARE: "1"
+      MESA_LOADER_DRIVER_OVERRIDE: "llvmpipe"
+      ROS_DISTRO: noetic
+      XDG_CONFIG_HOME: ${DEV_HOME:-/home/dev}/.config
+      DISABLE_ROS1_EOL_WARNINGS: "1"
+
+    user: "${DOCKER_UID:-1000}:${DOCKER_GID:-1000}"
+
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ${HOST_XAUTHORITY:-${HOME}/.Xauthority}:${DEV_HOME:-/home/dev}/.Xauthority:ro
+      - /dev/dri:/dev/dri
+      - ~/.ssh:${DEV_HOME:-/home/dev}/.ssh:ro
+      - ~/data:${DEV_HOME:-/home/dev}/data:rw
+
+      # workspace
+      - ${HOST_WORKSPACE}/src:${DEV_HOME:-/home/dev}/catkin_ws/src:rw
+      - ${HOST_WORKSPACE}/build:${DEV_HOME:-/home/dev}/catkin_ws/build:rw
+      - ${HOST_WORKSPACE}/devel:${DEV_HOME:-/home/dev}/catkin_ws/devel:rw
+      - ${HOST_WORKSPACE}/.catkin_tools:${DEV_HOME:-/home/dev}/catkin_ws/.catkin_tools:rw
+
+      # git
+      - ~/.gitconfig:${DEV_HOME:-/home/dev}/.gitconfig:ro
+      - ~/.git-credentials:${DEV_HOME:-/home/dev}/.git-credentials:ro
+
+      # persistent data
+      - ~/.bash_history:${DEV_HOME:-/home/dev}/.bash_history
+      - ./logs/ros:${DEV_HOME:-/home/dev}/.ros/log:rw
+      - ./logs/app:${DEV_HOME:-/home/dev}/logs:rw
+      - ./.vscode-server:${DEV_HOME:-/home/dev}/.vscode-server
+      - ./config:${DEV_HOME:-/home/dev}/.config:rw
+      - ~/.bashrc:${DEV_HOME:-/home/dev}/.bashrc:ro
+
+    devices:
+      - /dev/dri:/dev/dri

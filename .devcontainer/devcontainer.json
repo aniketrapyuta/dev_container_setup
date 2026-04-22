@@ -1,10 +1,10 @@
 {
-  "name": "RR Localization (Noetic)",
+  "name": "Development (Noetic)",
   "dockerComposeFile": [
-    "../docker-compose.localization.yaml"
+    "../docker-compose.yaml"
   ],
-  "service": "rr-localization-noetic",
-  "workspaceFolder": "/home/rr/catkin_ws/src",
+  "service": "development-noetic",
+  "workspaceFolder": "/home/dev/catkin_ws/src",
   "shutdownAction": "none",
   "overrideCommand": true,
   "initializeCommand": "bash ${localWorkspaceFolder}/scripts/init-host-x11.sh",
@@ -24,5 +24,5 @@
       }
     }
   },
-  "postAttachCommand": "bash -lc 'source /opt/ros/noetic/setup.bash && [ -f /home/rr/catkin_ws/devel/setup.bash ] && source /home/rr/catkin_ws/devel/setup.bash || true'"
+  "postAttachCommand": "bash -lc 'source /opt/ros/noetic/setup.bash && [ -f /home/dev/catkin_ws/devel/setup.bash ] && source /home/dev/catkin_ws/devel/setup.bash || true'"
 }
