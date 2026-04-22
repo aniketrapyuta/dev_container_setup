@@ -109,7 +109,7 @@ This repository includes `.devcontainer/devcontainer.json`.
 Build image only:
 
 ```bash
-docker compose -f docker-compose.localization.yaml build <container_name>
+docker compose -f docker-compose.yaml build <container_name>
 ```
 
 Start without attaching:
