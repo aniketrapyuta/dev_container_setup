@@ -1,6 +1,6 @@
 # Development Docker Environment
 
-This repository provides a reproducible development container with persistent workspace data, logs, and VS Code server state.
+This repository provides a reproducible development container with persistent workspace data, logs, VS Code server state, and also copilot state.
 I am currently using this to develop over with ROS Noetic packages on ubuntu 24.04
 
 ## What You Get
@@ -76,12 +76,8 @@ The startup script will:
 
 ```bash
 cd /home/dev/catkin_ws
-catkin build
-```
-
-To build one package:
-
-```bash
+source install/setup.bash # build over previously installed packages, assuming installed packages are here
+catkin init
 catkin build <package_name>
 ```
 
