@@ -6,7 +6,6 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 SERVICE_NAME="development-noetic"
 COMPOSE_FILE="${SCRIPT_DIR}/../docker-compose.yaml"
-PRIVATE_ENV_FILE="${SCRIPT_DIR}/../.private/.env"
 RUNTIME_ENV_FILE="${SCRIPT_DIR}/../.env"
 
 HOST_VSCODE_DIR="${SCRIPT_DIR}/../.vscode-server"
@@ -27,12 +26,11 @@ ensure_writable_dir() {
     fi
 }
 
-# Prepare host-side X11 and compose environment.
-bash "${SCRIPT_DIR}/init-host-x11.sh"
+# Prepare host-side display and compose environment.
+bash "${SCRIPT_DIR}/init-host.sh"
 
 # Export vars for this shell as well.
 set -a
-[ -f "$PRIVATE_ENV_FILE" ] && source "$PRIVATE_ENV_FILE"
 source "$RUNTIME_ENV_FILE"
 set +a
 

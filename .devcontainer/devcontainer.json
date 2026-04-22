@@ -7,7 +7,7 @@
   "workspaceFolder": "/home/dev/catkin_ws/src",
   "shutdownAction": "none",
   "overrideCommand": true,
-  "initializeCommand": "bash ${localWorkspaceFolder}/scripts/init-host-x11.sh",
+  "initializeCommand": "bash ${localWorkspaceFolder}/scripts/init-host.sh",
   "containerEnv": {
     "ROS_DISTRO": "noetic"
   },

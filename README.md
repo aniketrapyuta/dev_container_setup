@@ -19,13 +19,13 @@ I am currently using this to develop over with ROS Noetic packages on ubuntu 24.
 
 ## Host Setup
 
-Create local directories in this repository(gitignored):
+Create local directories in this repository (gitignored):
 
 ```bash
 mkdir -p .vscode-server config logs/ros logs/app
 ```
 
-Create your host catkin workspace directory (set as `HOST_WORKSPACE` in `.private/env`):
+Create your host catkin workspace directory (set as `HOST_WORKSPACE` in `.env`):
 
 ```bash
 mkdir -p /home/aniket/localizationws/{src,build,devel,install}
@@ -38,9 +38,9 @@ sudo chown -R "$(id -u):$(id -g)" \
 	.vscode-server config logs /home/aniket/localizationws
 ```
 
-## Private Overrides
+## Environment Config
 
-Create `.private/.env` (gitignored):
+Create `.env` in repository root (gitignored):
 
 ```bash
 BASE_IMAGE=<your image name> # ex: osrf/ros:noetic-desktop-full # to develop over this image in docker
@@ -50,13 +50,17 @@ HOST_WORKSPACE=/home/aniket/localizationws # your local catkin workspace
 IMAGE_NAME=my-dev-image # your custom image name
 CONTAINER_NAME=my-dev-container # your custom container name
 INSTALL_EXTRA_DEV_TOOLS=true # install additional ros tooling like ros-noetic-tf2-ros, etc
+DOCKER_UID=1000
+DOCKER_GID=1000
+DISPLAY=:0
+HOST_XAUTHORITY=/run/user/1000/.mutter-Xwaylandauth.M9W8N3 # for ubuntu24.04 wayland
 ```
 
 Notes:
 
 - `BASE_IMAGE` is the parent image used by `Dockerfile`.
 - `HOST_WORKSPACE` must contain `src`, `build`, and `devel` directories.
-- `scripts/start-loc.sh` loads `.private/.env` automatically.
+- `scripts/init-host.sh` refreshes runtime keys inside `.env`.
 
 ## Start Workflow
 
@@ -68,7 +72,6 @@ chmod +x ./scripts/start-loc.sh
 The startup script will:
 
 - prepare host X11 access, currently tested with ubuntu 24.04
-- load `.private/.env` and runtime `.env`
 - validate writable mounted directories
 - build image
 - start container
@@ -136,3 +139,7 @@ Permission denied under `/home/dev/.config`:
 Compose tries to pull `<container_name>`:
 
 - use `./scripts/start-loc.sh` so image is built before `up`
+
+Dev Containers fails with unset compose vars (`IMAGE_NAME`, `CONTAINER_NAME`, `HOST_WORKSPACE`):
+
+- run `bash scripts/init-host.sh` once, then retry `Dev Containers: Reopen in Container`
