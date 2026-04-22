@@ -1,0 +1,28 @@
+{
+  "name": "RR Localization (Noetic)",
+  "dockerComposeFile": [
+    "../docker-compose.localization.yaml"
+  ],
+  "service": "rr-localization-noetic",
+  "workspaceFolder": "/home/rr/catkin_ws/src",
+  "shutdownAction": "none",
+  "overrideCommand": true,
+  "initializeCommand": "bash ${localWorkspaceFolder}/scripts/init-host-x11.sh",
+  "containerEnv": {
+    "ROS_DISTRO": "noetic"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-iot.vscode-ros",
+        "ms-vscode.cpptools",
+        "ms-python.python",
+        "ms-azuretools.vscode-docker"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  },
+  "postAttachCommand": "bash -lc 'source /opt/ros/noetic/setup.bash && [ -f /home/rr/catkin_ws/devel/setup.bash ] && source /home/rr/catkin_ws/devel/setup.bash || true'"
+}

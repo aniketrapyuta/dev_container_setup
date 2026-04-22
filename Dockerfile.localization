@@ -1,0 +1,74 @@
+FROM quay.io/rapyuta/rr_localization:56cac2900f65e6b4b87ed8a92398ecec3ac06025
+
+USER root
+
+# Set to true at build time to install extra tools:
+# docker compose build --build-arg INSTALL_EXTRA_DEV_TOOLS=true rr-localization-noetic
+ARG INSTALL_EXTRA_DEV_TOOLS=false
+
+# Install core developer utilities by default and optional extended tooling.
+RUN set -eux; \
+        base_packages="\
+            bash-completion \
+            git \
+            curl \
+            wget \
+            ca-certificates \
+            gnupg2 \
+            lsb-release \
+            build-essential \
+            cmake \
+            pkg-config \
+            ninja-build \
+            ccache \
+            gdb \
+            valgrind \
+            strace \
+            lsof \
+            htop \
+            tmux \
+            python3-pip \
+            python3-venv \
+            python3-dev \
+            python3-setuptools \
+            python3-wheel \
+            python3-catkin-tools \
+            clang-format \
+            shellcheck \
+            jq \
+            iputils-ping \
+            net-tools \
+            iproute2 \
+            dnsutils \
+            openssh-client \
+        "; \
+        extra_packages="\
+            clang-tidy \
+            cppcheck \
+            ros-noetic-rqt \
+            ros-noetic-rqt-common-plugins \
+            ros-noetic-rviz \
+            ros-noetic-tf2-tools \
+            ros-noetic-tf2-ros \
+            ros-noetic-image-view \
+            ros-noetic-diagnostic-updater \
+            ros-noetic-roslint \
+            ros-noetic-xacro \
+            python3-rosdep \
+            python3-rosinstall \
+            python3-rosinstall-generator \
+            python3-wstool \
+        "; \
+        apt-get update; \
+        DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ${base_packages}; \
+        if [ "${INSTALL_EXTRA_DEV_TOOLS}" = "true" ]; then \
+            DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ${extra_packages}; \
+        fi; \
+        apt-get clean; \
+        rm -rf /var/lib/apt/lists/*
+
+    # Auto-source ROS and catkin workspace setup for interactive bash shells.
+    RUN printf '\n# ROS workspace environment\nsource /opt/ros/noetic/setup.bash\n[ -f /home/rr/catkin_ws/devel/setup.bash ] && source /home/rr/catkin_ws/devel/setup.bash\n' >> /etc/bash.bashrc
+
+# Return to the default non-root user used by this project.
+USER rr
