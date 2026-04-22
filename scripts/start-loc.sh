@@ -37,6 +37,7 @@ source "$RUNTIME_ENV_FILE"
 set +a
 
 DEFAULT_WORKDIR="${DEV_HOME:-/home/dev}/catkin_ws"
+CONTAINER_NAME="${CONTAINER_NAME:-$SERVICE_NAME}"
 
 # Ensure mounted host dirs are writable by current user.
 ensure_writable_dir "$HOST_CONFIG_DIR"
