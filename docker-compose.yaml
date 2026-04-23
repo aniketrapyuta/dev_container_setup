@@ -39,7 +39,7 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - ${HOST_XAUTHORITY:-${HOME}/.Xauthority}:${DEV_HOME:-/home/dev}/.Xauthority:ro
       - /dev/dri:/dev/dri
-      - ~/.ssh:${DEV_HOME:-/home/dev}/.ssh:ro
+      - ~/.ssh:${DEV_HOME:-/home/dev}/.ssh:rw
       - ~/data:${DEV_HOME:-/home/dev}/data:rw
 
       # workspace
