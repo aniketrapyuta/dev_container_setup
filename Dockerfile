@@ -1,59 +1,81 @@
+# -------- Base --------
 ARG BASE_IMAGE=osrf/ros:noetic-desktop-full
 FROM ${BASE_IMAGE}
 
-ARG DEV_USER=dev
-ARG DEV_HOME=/home/dev
+# Use bash for all RUN commands
+SHELL ["/bin/bash", "-c"]
 
 USER root
 
-# Set to true at build time to install extra tools:
-# docker compose build --build-arg INSTALL_EXTRA_DEV_TOOLS=true development-noetic
-ARG INSTALL_EXTRA_DEV_TOOLS=false
+# -------- Build arguments --------
+ARG DEV_USER=dev
+ARG DEV_UID=1000
+ARG DEV_GID=1000
+ARG DEV_HOME=/home/${DEV_USER}
+ARG INSTALL_EXTRA_DEV_TOOLS=true
 
-# Install core developer utilities by default and optional extended tooling.
+ENV DEBIAN_FRONTEND=noninteractive
+
+# -------- System + core dev tools --------
 RUN set -eux; \
-        base_packages="\
-            bash-completion \
-            git \
-            curl \
-            wget \
-            ca-certificates \
-            gnupg2 \
-            lsb-release \
-            build-essential \
-            cmake \
-            pkg-config \
-            ninja-build \
-            ccache \
-            gdb \
-            valgrind \
-            strace \
-            lsof \
-            htop \
-            tmux \
-            python3-pip \
-            python3-venv \
-            python3-dev \
-            python3-setuptools \
-            python3-wheel \
-            python3-catkin-tools \
-            clang-format \
-            shellcheck \
-            jq \
-            iputils-ping \
-            net-tools \
-            iproute2 \
-            dnsutils \
-            openssh-client \
-        "; \
-        extra_packages="\
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+        bash-completion \
+        git \
+        curl \
+        wget \
+        ca-certificates \
+        gnupg2 \
+        lsb-release \
+        build-essential \
+        cmake \
+        pkg-config \
+        ninja-build \
+        ccache \
+        gdb \
+        valgrind \
+        strace \
+        lsof \
+        htop \
+        tmux \
+        python3-pip \
+        python3-venv \
+        python3-dev \
+        python3-setuptools \
+        python3-wheel \
+        python3-catkin-tools \
+        clang-format \
+        shellcheck \
+        jq \
+        iputils-ping \
+        net-tools \
+        iproute2 \
+        dnsutils \
+        openssh-client \
+        locales \
+        sudo \
+    ; \
+    rm -rf /var/lib/apt/lists/*
+
+# -------- Locale (ROS-friendly) --------
+RUN set -eux; \
+    locale-gen en_US.UTF-8; \
+    update-locale LANG=en_US.UTF-8
+
+ENV LANG=en_US.UTF-8
+ENV LC_ALL=en_US.UTF-8
+
+# -------- Optional ROS + dev extras --------
+RUN set -eux; \
+    if [ "${INSTALL_EXTRA_DEV_TOOLS}" = "true" ]; then \
+        apt-get update; \
+        apt-get install -y --no-install-recommends \
             clang-tidy \
             cppcheck \
             ros-noetic-rqt \
             ros-noetic-rqt-common-plugins \
             ros-noetic-rviz \
             ros-noetic-tf2-tools \
-            ros-noetic-tf2-ros \
             ros-noetic-image-view \
             ros-noetic-diagnostic-updater \
             ros-noetic-roslint \
@@ -62,31 +84,67 @@ RUN set -eux; \
             python3-rosinstall \
             python3-rosinstall-generator \
             python3-wstool \
-        "; \
-        apt-get update; \
-        DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ${base_packages}; \
-        if [ "${INSTALL_EXTRA_DEV_TOOLS}" = "true" ]; then \
-            DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ${extra_packages}; \
-        fi; \
-        apt-get clean; \
-        rm -rf /var/lib/apt/lists/*
+        ; \
+        rm -rf /var/lib/apt/lists/*; \
+    fi
 
-    # Rename the existing UID-1000 user to DEV_USER and relocate home to DEV_HOME.
-    RUN set -eux; \
-        OLD_USER="$(getent passwd 1000 | cut -d: -f1)"; \
-        OLD_GROUP="$(getent group 1000 | cut -d: -f1)"; \
-        if [ -n "$OLD_USER" ] && [ "$OLD_USER" != "${DEV_USER}" ]; then \
-            groupmod -n "${DEV_USER}" "$OLD_GROUP"; \
-            usermod -l "${DEV_USER}" -d "${DEV_HOME}" -m "$OLD_USER"; \
-        else \
-            useradd -m -u 1000 -d "${DEV_HOME}" -s /bin/bash "${DEV_USER}"; \
-        fi; \
-        chown -R "${DEV_USER}:${DEV_USER}" "${DEV_HOME}"
+# -------- Python tools (separate for caching) --------
+RUN set -eux; \
+    python3 -m pip install --no-cache-dir --upgrade pip
 
-    # Auto-source ROS and catkin workspace setup for interactive bash shells.
-    RUN printf '\n# ROS workspace environment\nsource /opt/ros/noetic/setup.bash\n[ -f ${DEV_HOME}/catkin_ws/devel/setup.bash ] && source ${DEV_HOME}/catkin_ws/devel/setup.bash\n' >> /etc/bash.bashrc
+RUN set -eux; \
+    if [ "${INSTALL_EXTRA_DEV_TOOLS}" = "true" ]; then \
+        python3 -m pip install --no-cache-dir \
+            flake8 \
+            flake8-docstrings \
+            flake8-import-order \
+            flake8-bugbear \
+            pre-commit \
+        ; \
+    fi
 
-    ENV HOME=${DEV_HOME}
+# -------- Create non-root user safely --------
+RUN set -eux; \
+    if id -u ${DEV_USER} >/dev/null 2>&1; then \
+        echo "User ${DEV_USER} already exists, reusing"; \
+    elif getent passwd ${DEV_UID} >/dev/null; then \
+        OLD_USER="$(getent passwd ${DEV_UID} | cut -d: -f1)"; \
+        OLD_GROUP="$(getent passwd ${DEV_UID} | cut -d: -f4)"; \
+        echo "UID ${DEV_UID} belongs to ${OLD_USER}, renaming to ${DEV_USER}"; \
+        groupmod -n ${DEV_USER} "$(getent group ${OLD_GROUP} | cut -d: -f1)"; \
+        usermod -l ${DEV_USER} -d /home/${DEV_USER} -m ${OLD_USER}; \
+    else \
+        echo "Creating new user ${DEV_USER}"; \
+        groupadd -g ${DEV_GID} ${DEV_USER}; \
+        useradd -m -u ${DEV_UID} -g ${DEV_GID} -s /bin/bash ${DEV_USER}; \
+    fi; \
+    usermod -aG sudo ${DEV_USER}; \
+    echo "${DEV_USER} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/${DEV_USER}; \
+    chmod 0440 /etc/sudoers.d/${DEV_USER}
 
-# Return to the default non-root user used by this project.
-    USER ${DEV_USER}
+# -------- ROS environment setup --------
+RUN set -eux; \
+    echo "source /opt/ros/noetic/setup.bash" >> /etc/skel/.bashrc; \
+    echo "[ -f ~/catkin_ws/install/setup.bash ] && source ~/catkin_ws/install/setup.bash" >> /etc/skel/.bashrc; \
+    echo "[ -f ~/catkin_ws/devel/setup.bash ] && source ~/catkin_ws/devel/setup.bash" >> /etc/skel/.bashrc
+
+# Apply skeleton config to existing user
+RUN set -eux; \
+    cp /etc/skel/.bashrc ${DEV_HOME}/.bashrc; \
+    chown ${DEV_UID}:${DEV_GID} ${DEV_HOME}/.bashrc
+
+# -------- (Optional) rosdep init --------
+RUN set -eux; \
+    if command -v rosdep >/dev/null 2>&1; then \
+        rosdep init || true; \
+        rosdep update || true; \
+    fi
+
+# -------- Environment --------
+ENV HOME=${DEV_HOME}
+WORKDIR ${DEV_HOME}
+
+# -------- Switch to non-root --------
+USER ${DEV_USER}
+
+CMD ["bash"]
