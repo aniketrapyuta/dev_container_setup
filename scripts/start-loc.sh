@@ -37,20 +37,27 @@ set +a
 DEFAULT_WORKDIR="${DEV_HOME:-/home/dev}/catkin_ws"
 CONTAINER_NAME="${CONTAINER_NAME:-$SERVICE_NAME}"
 
-# Ensure mounted host dirs are writable by current user.
-ensure_writable_dir "$HOST_CONFIG_DIR"
-ensure_writable_dir "$HOST_VSCODE_DIR"
-ensure_writable_dir "$HOST_ROS_LOG_DIR"
-ensure_writable_dir "$HOST_APP_LOG_DIR"
-ensure_writable_dir "$HOST_WORKSPACE"
+# Check if container is already running
+CONTAINER_STATUS=$(docker inspect -f '{{.State.Status}}' "$CONTAINER_NAME" 2>/dev/null || true)
 
-# Build local dev image (pulls BASE_IMAGE as needed).
-echo "Building image..."
-docker compose -f "$COMPOSE_FILE" build "$SERVICE_NAME"
+if [ "$CONTAINER_STATUS" = "running" ]; then
+    echo "Container already running, attaching to $CONTAINER_NAME..."
+else
+    # Ensure mounted host dirs are writable by current user.
+    ensure_writable_dir "$HOST_CONFIG_DIR"
+    ensure_writable_dir "$HOST_VSCODE_DIR"
+    ensure_writable_dir "$HOST_ROS_LOG_DIR"
+    ensure_writable_dir "$HOST_APP_LOG_DIR"
+    ensure_writable_dir "$HOST_WORKSPACE"
 
-# Always ensure container exists + running
-echo "Starting container..."
-docker compose -f "$COMPOSE_FILE" up -d --remove-orphans "$SERVICE_NAME"
+    # Build local dev image (pulls BASE_IMAGE as needed).
+    echo "Building image..."
+    docker compose -f "$COMPOSE_FILE" build "$SERVICE_NAME"
+
+    # Always ensure container exists + running
+    echo "Starting container..."
+    docker compose -f "$COMPOSE_FILE" up -d --remove-orphans "$SERVICE_NAME"
+fi
 
 # Wait until container is ready (bail out if it exits)
 echo "Waiting for container..."
