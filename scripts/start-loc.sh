@@ -8,26 +8,8 @@ SERVICE_NAME="development-noetic"
 COMPOSE_FILE="${SCRIPT_DIR}/../docker-compose.yaml"
 RUNTIME_ENV_FILE="${SCRIPT_DIR}/../.env"
 
-HOST_VSCODE_DIR="${SCRIPT_DIR}/../.vscode-server"
-HOST_ROS_LOG_DIR="${SCRIPT_DIR}/../logs/ros"
-HOST_APP_LOG_DIR="${SCRIPT_DIR}/../logs/app"
-HOST_CONFIG_DIR="${SCRIPT_DIR}/../config"
-
-ensure_writable_dir() {
-    local dir="$1"
-    mkdir -p "$dir" 2>/dev/null || true
-    if [ ! -w "$dir" ]; then
-        chown -R "$(id -u):$(id -g)" "$dir" 2>/dev/null || true
-    fi
-    if [ ! -w "$dir" ]; then
-        echo "ERROR: Host directory is not writable: $dir"
-        echo "Run: sudo chown -R $(id -u):$(id -g) '$dir'"
-        exit 1
-    fi
-}
-
 # Prepare host-side display and compose environment.
-bash "${SCRIPT_DIR}/init-host.sh"
+source "${SCRIPT_DIR}/init-host.sh"
 
 # Export vars for this shell as well.
 set -a

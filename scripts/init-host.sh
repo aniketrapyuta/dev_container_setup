@@ -38,3 +38,24 @@ if command -v xhost >/dev/null 2>&1; then
   xhost +SI:localuser:"$(id -un)" >/dev/null 2>&1 || true
   xhost +local:docker >/dev/null 2>&1 || true
 fi
+
+# Host directory paths
+export HOST_VSCODE_DIR="${ROOT_DIR}/.vscode-server"
+export HOST_ROS_LOG_DIR="${ROOT_DIR}/logs/ros"
+export HOST_APP_LOG_DIR="${ROOT_DIR}/logs/app"
+export HOST_CONFIG_DIR="${ROOT_DIR}/config"
+export HOST_WORKSPACE="${ROOT_DIR}"
+
+# Ensure a directory exists and is writable by the current user
+ensure_writable_dir() {
+    local dir="$1"
+    mkdir -p "$dir" 2>/dev/null || true
+    if [ ! -w "$dir" ]; then
+        chown -R "$(id -u):$(id -g)" "$dir" 2>/dev/null || true
+    fi
+    if [ ! -w "$dir" ]; then
+        echo "ERROR: Host directory is not writable: $dir"
+        echo "Run: sudo chown -R $(id -u):$(id -g) '$dir'"
+        exit 1
+    fi
+}
