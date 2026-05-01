@@ -92,15 +92,29 @@ RUN set -eux; \
 RUN set -eux; \
     python3 -m pip install --no-cache-dir --upgrade pip
 
+# Core Python deps
 RUN set -eux; \
     if [ "${INSTALL_EXTRA_DEV_TOOLS}" = "true" ]; then \
-        python3 -m pip install --no-cache-dir \
+        python3 -m pip install --no-cache-dir --ignore-installed \
+            numpy \ 
+            scipy \
+            matplotlib \
+            opencv-contrib-python \
+            open3d \
+            evo \
+            ; \
+    fi
+
+# Dev-only Python tools
+RUN set -eux; \
+    if [ "${INSTALL_EXTRA_DEV_TOOLS}" = "true" ]; then \
+        python3 -m pip install --no-cache-dir --ignore-installed \
             flake8 \
             flake8-docstrings \
             flake8-import-order \
             flake8-bugbear \
             pre-commit \
-        ; \
+            ; \
     fi
 
 # -------- Create non-root user safely --------
