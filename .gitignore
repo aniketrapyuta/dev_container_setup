@@ -1,4 +1,5 @@
 logs
+.cache
 config
 .vscode-server
 .private/

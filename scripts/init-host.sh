@@ -44,6 +44,7 @@ export HOST_VSCODE_DIR="${ROOT_DIR}/.vscode-server"
 export HOST_ROS_LOG_DIR="${ROOT_DIR}/logs/ros"
 export HOST_APP_LOG_DIR="${ROOT_DIR}/logs/app"
 export HOST_CONFIG_DIR="${ROOT_DIR}/config"
+export HOST_CACHE_DIR="${ROOT_DIR}/.cache"
 export HOST_WORKSPACE="${ROOT_DIR}"
 
 # Ensure a directory exists and is writable by the current user

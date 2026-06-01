@@ -91,6 +91,7 @@ catkin build <package_name>
 - Host `~/.bash_history` -> Container `/home/dev/.bash_history`
 - Host `./logs/ros` -> Container `/home/dev/.ros/log`
 - Host `./logs/app` -> Container `/home/dev/logs`
+- Host `./.cache` -> Container `/home/dev/.cache`
 - Host `./config` -> Container `/home/dev/.config`
 - Host `./.vscode-server` -> Container `/home/dev/.vscode-server`
 - Host `${HOST_WORKSPACE}/src` -> Container `/home/dev/catkin_ws/src`
