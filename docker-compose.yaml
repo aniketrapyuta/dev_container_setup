@@ -54,7 +54,7 @@ services:
       - ~/.git-credentials:${DEV_HOME:-/home/dev}/.git-credentials:ro
 
       # persistent data
-      - ~/.bash_history:${DEV_HOME:-/home/dev}/.bash_history
+      - ~/.bash_history:${DEV_HOME:-/home/dev}/.bash_history:rw
       - ./logs/ros:${DEV_HOME:-/home/dev}/.ros/log:rw
       - ./logs/app:${DEV_HOME:-/home/dev}/logs:rw
       - ./.cache:${DEV_HOME:-/home/dev}/.cache:rw
