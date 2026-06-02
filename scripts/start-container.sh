@@ -6,15 +6,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 SERVICE_NAME="development-noetic"
 COMPOSE_FILE="${SCRIPT_DIR}/../docker-compose.yaml"
-RUNTIME_ENV_FILE="${SCRIPT_DIR}/../.env"
 
 # Prepare host-side display and compose environment.
 source "${SCRIPT_DIR}/init-host.sh"
-
-# Export vars for this shell as well.
-set -a
-source "$RUNTIME_ENV_FILE"
-set +a
 
 DEFAULT_WORKDIR="${DEV_HOME:-/home/dev}/catkin_ws"
 CONTAINER_NAME="${CONTAINER_NAME:-$SERVICE_NAME}"

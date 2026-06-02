@@ -65,8 +65,8 @@ Notes:
 ## Start Workflow
 
 ```bash
-chmod +x ./scripts/start-loc.sh
-./scripts/start-loc.sh
+chmod +x ./scripts/start-container.sh
+./scripts/start-container.sh
 ```
 
 The startup script will:
@@ -139,7 +139,7 @@ Permission denied under `/home/dev/.config`:
 
 Compose tries to pull `<container_name>`:
 
-- use `./scripts/start-loc.sh` so image is built before `up`
+- use `./scripts/start-container.sh` so image is built before `up`
 
 Dev Containers fails with unset compose vars (`IMAGE_NAME`, `CONTAINER_NAME`, `HOST_WORKSPACE`):
 
