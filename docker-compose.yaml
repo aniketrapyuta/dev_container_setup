@@ -61,6 +61,7 @@ services:
       - ./.vscode-server:${DEV_HOME:-/home/dev}/.vscode-server
       - ./config:${DEV_HOME:-/home/dev}/.config:rw
       - ~/.bashrc:${DEV_HOME:-/home/dev}/.bashrc:ro
+      - ~/.claude:/home/dev/.claude:rw
 
     devices:
       - /dev/dri:/dev/dri
