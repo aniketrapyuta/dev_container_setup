@@ -80,6 +80,9 @@ RUN set -eux; \
             ros-noetic-diagnostic-updater \
             ros-noetic-roslint \
             ros-noetic-xacro \
+            ros-noetic-rosbridge-suite \
+            ros-noetic-plotjuggler-ros \
+            ros-noetic-jsk-visualization \
             python3-rosdep \
             python3-rosinstall \
             python3-rosinstall-generator \
