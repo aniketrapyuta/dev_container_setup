@@ -98,6 +98,14 @@ catkin build <package_name>
 - Host `${HOST_WORKSPACE}/build` -> Container `/home/dev/catkin_ws/build`
 - Host `${HOST_WORKSPACE}/devel` -> Container `/home/dev/catkin_ws/devel`
 
+Note: bash only writes history to `~/.bash_history` on a clean shell exit. Since containers are often killed/rebooted without one, the host `~/.bashrc` needs:
+
+```bash
+export PROMPT_COMMAND="history -a; history -n"
+```
+
+This flushes and reloads history after every command instead of waiting for shell exit, so the mounted `~/.bash_history` stays up to date.
+
 ## VS Code Dev Container
 
 This repository includes `.devcontainer/devcontainer.json`.
