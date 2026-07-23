@@ -26,6 +26,7 @@ else
     ensure_writable_dir "$HOST_ROS_LOG_DIR"
     ensure_writable_dir "$HOST_APP_LOG_DIR"
     ensure_writable_dir "$HOST_WORKSPACE"
+    ensure_writable_file "$HOST_CACHE_DIR/docker_bash_history_${CONTAINER_NAME}"
 
     # Build local dev image (pulls BASE_IMAGE as needed).
     echo "Building image..."

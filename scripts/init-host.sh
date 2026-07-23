@@ -59,3 +59,19 @@ ensure_writable_dir() {
         exit 1
     fi
 }
+
+ensure_writable_file() {
+    local file="$1"
+    mkdir -p "$(dirname "$file")" 2>/dev/null || true
+    if [ ! -e "$file" ]; then
+        touch "$file" 2>/dev/null || true
+    fi
+    if [ ! -w "$file" ]; then
+        chown "$(id -u):$(id -g)" "$file" 2>/dev/null || true
+    fi
+    if [ ! -f "$file" ] || [ ! -w "$file" ]; then
+        echo "ERROR: Host file is missing or not writable: $file"
+        echo "Run: sudo chown $(id -u):$(id -g) '$file'"
+        exit 1
+    fi
+}
