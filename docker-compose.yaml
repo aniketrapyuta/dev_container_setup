@@ -51,7 +51,6 @@ services:
 
       # git
       - ~/.gitconfig:${DEV_HOME:-/home/dev}/.gitconfig:ro
-      - ~/.git-credentials:${DEV_HOME:-/home/dev}/.git-credentials:ro
 
       # persistent data
       - ./logs/ros:${DEV_HOME:-/home/dev}/.ros:rw
