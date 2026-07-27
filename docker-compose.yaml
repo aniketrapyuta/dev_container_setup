@@ -39,6 +39,7 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - ${HOST_XAUTHORITY:-${HOME}/.Xauthority}:${DEV_HOME:-/home/dev}/.Xauthority:ro
       - /dev/dri:/dev/dri
+      - /dev/bus/usb:/dev/bus/usb
       - ~/.ssh:${DEV_HOME:-/home/dev}/.ssh:rw
       - ~/data:${DEV_HOME:-/home/dev}/data:rw
 
@@ -61,6 +62,7 @@ services:
       - ./config:${DEV_HOME:-/home/dev}/.config:rw
       - ~/.bashrc:${DEV_HOME:-/home/dev}/.bashrc:ro
       - ~/.claude:/home/dev/.claude:rw
+      - ~/.claude.json:/home/dev/.claude.json:rw
 
     devices:
       - /dev/dri:/dev/dri
