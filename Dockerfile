@@ -57,6 +57,17 @@ RUN set -eux; \
     ; \
     rm -rf /var/lib/apt/lists/*
 
+# -------- GitHub CLI (not packaged for focal/universe) --------
+RUN set -eux; \
+    mkdir -p /etc/apt/keyrings; \
+    curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+        -o /etc/apt/keyrings/githubcli-archive-keyring.gpg; \
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+        > /etc/apt/sources.list.d/github-cli.list; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends gh; \
+    rm -rf /var/lib/apt/lists/*
+
 # -------- Locale (ROS-friendly) --------
 RUN set -eux; \
     locale-gen en_US.UTF-8; \
@@ -90,6 +101,26 @@ RUN set -eux; \
         ; \
         rm -rf /var/lib/apt/lists/*; \
     fi
+
+# -------- Intel RealSense (librealsense2) --------
+# The key published at librealsense.intel.com/Debian/librealsense.pgp no longer
+# matches the key that signs the repo's InRelease file (Intel rotated it without
+# updating that URL), so fetch the current signing key from the Ubuntu keyserver
+# over HTTPS instead (avoids needing dirmngr for the keyserver protocol).
+RUN set -eux; \
+    mkdir -p /etc/apt/keyrings; \
+    curl -sSf "https://keyserver.ubuntu.com/pks/lookup?op=get&options=mr&search=0xFB0B24895113F120" \
+        | gpg --dearmor > /etc/apt/keyrings/librealsense.pgp; \
+    echo "deb [signed-by=/etc/apt/keyrings/librealsense.pgp] https://librealsense.intel.com/Debian/apt-repo $(lsb_release -cs) main" \
+        > /etc/apt/sources.list.d/librealsense.list; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+        librealsense2-utils \
+        librealsense2-dev \
+        librealsense2-dbg \
+        ros-noetic-realsense2-camera \
+    ; \
+    rm -rf /var/lib/apt/lists/*
 
 # -------- Python tools (separate for caching) --------
 RUN set -eux; \
