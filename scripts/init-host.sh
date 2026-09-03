@@ -45,6 +45,7 @@ export HOST_ROS_LOG_DIR="${ROOT_DIR}/logs/ros"
 export HOST_APP_LOG_DIR="${ROOT_DIR}/logs/app"
 export HOST_CONFIG_DIR="${ROOT_DIR}/config"
 export HOST_CACHE_DIR="${ROOT_DIR}/.cache"
+export HOST_DATA_DIR="${HOST_DATA_DIR:-${HOME}/data}"
 
 # Ensure a directory exists and is writable by the current user
 ensure_writable_dir() {
@@ -75,3 +76,23 @@ ensure_writable_file() {
         exit 1
     fi
 }
+
+ensure_writable_dir "$HOST_CONFIG_DIR"
+ensure_writable_dir "$HOST_CACHE_DIR"
+ensure_writable_dir "$HOST_VSCODE_DIR"
+ensure_writable_dir "$HOST_ROS_LOG_DIR"
+ensure_writable_dir "$HOST_APP_LOG_DIR"
+
+ensure_writable_dir "${HOME}/.ssh"
+ensure_writable_dir "$HOST_DATA_DIR"
+ensure_writable_dir "${HOME}/.claude"
+
+# To prevent docker from bind-mounting sub directories as root
+if [[ -n "${HOST_WORKSPACE:-}" ]]; then
+  ensure_writable_dir "${HOST_WORKSPACE}"
+  ensure_writable_dir "${HOST_WORKSPACE}/src"
+  ensure_writable_dir "${HOST_WORKSPACE}/build"
+  ensure_writable_dir "${HOST_WORKSPACE}/devel"
+  ensure_writable_dir "${HOST_WORKSPACE}/logs"
+  ensure_writable_dir "${HOST_WORKSPACE}/.catkin_tools"
+fi

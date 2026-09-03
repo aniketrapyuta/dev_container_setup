@@ -19,34 +19,34 @@ I am currently using this to develop over with ROS Noetic packages on ubuntu 24.
 
 ## Host Setup
 
-Create local directories in this repository (gitignored):
+`scripts/init-host.sh` auto-creates and fixes ownership of the 
+repo-local dirs (`.vscode-server`, `config`, `logs/ros`, `logs/app`)
+and the `HOST_WORKSPACE` subdirs (`src`, `build`, `devel`, `logs`,
+`.catkin_tools`) on every run, whether you start via
+`./scripts/start-container.sh` or VS Code's "Reopen in Container".
+
+If ownership ever drifts (e.g. a dir got created as root some other way):
 
 ```bash
-mkdir -p .vscode-server config logs/ros logs/app
+sudo chown -R "$(id -u):$(id -g)" .vscode-server config logs "$HOST_WORKSPACE" "$HOST_DATA_DIR"
 ```
 
-Create your host catkin workspace directory (set as `HOST_WORKSPACE` in `.env`):
-
-```bash
-mkdir -p /home/aniket/localizationws/{src,build,devel,install}
-```
-
-Fix ownership if needed:
-
-```bash
-sudo chown -R "$(id -u):$(id -g)" \
-	.vscode-server config logs /home/aniket/localizationws
-```
+Note: the script only fixes the top-level dir automatically on each run — a
+root-owned *subdirectory* inside (e.g. left over from a container that once
+ran as root) won't be auto-detected, since that would require a full
+recursive scan on every startup. Run the command above if you hit
+`Permission denied` on a specific path.
 
 ## Environment Config
 
-Create `.env` in repository root (gitignored):
+Create `.env` in repository root (gitignored), for example:
 
 ```bash
 BASE_IMAGE=<your image name> # ex: osrf/ros:noetic-desktop-full # to develop over this image in docker
 DEV_USER=dev # username inside docker container
 DEV_HOME=/home/dev # home directory inside docker container
 HOST_WORKSPACE=/home/aniket/localizationws # your local catkin workspace
+HOST_DATA_DIR=/home/aniket/data # your local data dir, mounted at ${DEV_HOME}/data
 IMAGE_NAME=my-dev-image # your custom image name
 CONTAINER_NAME=my-dev-container # your custom container name
 INSTALL_EXTRA_DEV_TOOLS=true # install additional ros tooling like ros-noetic-tf2-ros, etc
@@ -59,7 +59,7 @@ HOST_XAUTHORITY=/run/user/1000/.mutter-Xwaylandauth.M9W8N3 # for ubuntu24.04 way
 Notes:
 
 - `BASE_IMAGE` is the parent image used by `Dockerfile`.
-- `HOST_WORKSPACE` must contain `src`, `build`, and `devel` directories.
+- `HOST_WORKSPACE` subdirs (`src`, `build`, `devel`) are auto-created by `scripts/init-host.sh`.
 - `scripts/init-host.sh` refreshes runtime keys inside `.env`.
 
 ## Start Workflow

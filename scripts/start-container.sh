@@ -19,13 +19,6 @@ CONTAINER_STATUS=$(docker inspect -f '{{.State.Status}}' "$CONTAINER_NAME" 2>/de
 if [ "$CONTAINER_STATUS" = "running" ]; then
     echo "Container already running, attaching to $CONTAINER_NAME..."
 else
-    # Ensure mounted host dirs are writable by current user.
-    ensure_writable_dir "$HOST_CONFIG_DIR"
-    ensure_writable_dir "$HOST_CACHE_DIR"
-    ensure_writable_dir "$HOST_VSCODE_DIR"
-    ensure_writable_dir "$HOST_ROS_LOG_DIR"
-    ensure_writable_dir "$HOST_APP_LOG_DIR"
-    ensure_writable_dir "$HOST_WORKSPACE"
     ensure_writable_file "$HOST_CACHE_DIR/docker_bash_history_${CONTAINER_NAME}"
 
     # Build local dev image (pulls BASE_IMAGE as needed).

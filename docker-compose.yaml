@@ -41,7 +41,7 @@ services:
       - /dev/dri:/dev/dri
       - /dev/bus/usb:/dev/bus/usb
       - ~/.ssh:${DEV_HOME:-/home/dev}/.ssh:rw
-      - ~/data:${DEV_HOME:-/home/dev}/data:rw
+      - ${HOST_DATA_DIR:-~/data}:${DEV_HOME:-/home/dev}/data:rw
 
       # workspace
       - ${HOST_WORKSPACE}/src:${DEV_HOME:-/home/dev}/catkin_ws/src:rw
